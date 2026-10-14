@@ -1,2 +1,4 @@
 venv/
 kb/chroma_data/
+__pycache__/
+*.pyc
