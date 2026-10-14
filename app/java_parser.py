@@ -6,6 +6,13 @@ def validate_java(code: str) -> Dict[str, Any]:
     Parses Java source code using javalang to verify syntax
     and extracts declared classes and methods.
     """
+    if not code.strip():
+        return {
+            "is_valid": False,
+            "error": "Submission is empty. Please provide Java code.",
+            "metadata": {}
+        }
+
     try:
         tokens = javalang.tokenizer.tokenize(code)
         parser = javalang.parser.Parser(tokens)
@@ -14,10 +21,10 @@ def validate_java(code: str) -> Dict[str, Any]:
         classes: List[str] = []
         methods: List[str] = []
         
-        for path, node in tree.filter(javalang.tree.ClassDeclaration):
+        for _, node in tree.filter(javalang.tree.ClassDeclaration):
             classes.append(node.name)
             
-        for path, node in tree.filter(javalang.tree.MethodDeclaration):
+        for _, node in tree.filter(javalang.tree.MethodDeclaration):
             methods.append(node.name)
 
         return {
@@ -29,15 +36,15 @@ def validate_java(code: str) -> Dict[str, Any]:
                 "lines_of_code": len(code.splitlines())
             }
         }
-    except (javalang.parser.JavaSyntaxError, javalang.tokenizer.LexerError) as err:
+    except (javalang.parser.JavaSyntaxError, javalang.tokenizer.LexerError) as e:
         return {
             "is_valid": False,
-            "error": f"Java Parsing Error: {str(err)}",
+            "error": f"Java Syntax Error: {str(e)}",
             "metadata": {}
         }
-    except Exception as err:
+    except Exception as e:
         return {
             "is_valid": False,
-            "error": f"Unexpected Java parse failure: {str(err)}",
+            "error": f"Java Parsing Failed: {str(e)}",
             "metadata": {}
         }
